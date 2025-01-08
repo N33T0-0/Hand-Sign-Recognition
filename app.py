@@ -42,7 +42,7 @@ def run():
 
     # Release the video capture object and close the OpenCV windows
     cap.release()
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
 st.title("Hand Sign Recognition")
 
