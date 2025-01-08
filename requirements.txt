@@ -2,3 +2,4 @@ opencv-python
 streamlit_webrtc
 av
 mediapipe == 0.10.9
+libgl1-mesa-glx
