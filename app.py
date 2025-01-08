@@ -5,6 +5,7 @@ import hand_recognition as hr
 
 st.title("Hand Sign Recognition")
 
-hr.run()
+if st.button('Start Camera'):
+    hr.run()
 
 # webrtc_streamer(key="streamer")
