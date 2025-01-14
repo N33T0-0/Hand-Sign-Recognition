@@ -1,49 +1,42 @@
+
+import streamlit as st
+from camera_input_live import camera_input_live
 import cv2
+from PIL import Image
+from io import BytesIO
 import numpy as np
-import av
-import mediapipe as mp
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(
-    model_complexity=0,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5
-)
 
-def process(image):
-    image.flags.writeable = False
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    results = hands.process(image)
-# Draw the hand annotations on the image.
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    if results.multi_hand_landmarks:
-      for hand_landmarks in results.multi_hand_landmarks:
-        mp_drawing.draw_landmarks(
-            image,
-            hand_landmarks,
-            mp_hands.HAND_CONNECTIONS,
-            mp_drawing_styles.get_default_hand_landmarks_style(),
-            mp_drawing_styles.get_default_hand_connections_style())
-    return cv2.flip(image, 1)
+st.title("My first Streamlit app")
+st.write("Hello, world")
 
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
 
-class VideoProcessor:
-    def recv(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-        img = process(img)
-        return av.VideoFrame.from_ndarray(img, format="bgr24")
+def callback(frame):
 
-webrtc_ctx = webrtc_streamer(
-    key="WYH",
-    mode=WebRtcMode.SENDRECV,
-    rtc_configuration=RTC_CONFIGURATION,
-    media_stream_constraints={"video": True, "audio": False},
-    video_processor_factory=VideoProcessor,
-    async_processing=True,
-)
+    img = cv2.imdecode(np.frombuffer(frame.read(), np.uint8), 1)
+
+    img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
+
+    # convert Image...
+    image_conv = Image.fromarray(img)
+
+    img_buffer = BytesIO()
+    image_conv.save(img_buffer, format='PNG')  # Save the image to the BytesIO object
+    img_buffer.seek(0)
+
+    return img_buffer
+
+
+image = callback(camera_input_live(debounce=300))
+
+# # Convert Image
+# image_conv = Image.open(image)
+
+# print(image_conv)
+
+# img_buffer = BytesIO()
+# image_conv.save(img_buffer, format='PNG')  # Save the image to the BytesIO object
+# img_buffer.seek(0)
+
+
+if image:
+    st.image(image)
