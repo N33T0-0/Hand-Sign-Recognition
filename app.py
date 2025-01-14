@@ -201,10 +201,11 @@ def run(image):
 
     return img_buffer
 
-image = run(camera_input_live(debounce=2000))
+image = camera_input_live(debounce=3000)
 
 if image:
-    st.image(image)
+    processed = run(image)
+    st.image(processed)
 
 # while enable:
 
