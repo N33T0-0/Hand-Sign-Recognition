@@ -129,3 +129,4 @@ webrtc_streamer(
     async_processing=True,  # Ensures asynchronous handling
     rtc_configuration={"iceServers": get_ice_servers()},
 )
+
