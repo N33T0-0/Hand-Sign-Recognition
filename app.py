@@ -201,7 +201,7 @@ def run(image):
 
     return img_buffer
 
-image = run(camera_input_live(debounce=1000))
+image = run(camera_input_live(debounce=2000))
 
 if image:
     st.image(image)
