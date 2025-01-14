@@ -2,3 +2,4 @@ opencv-python-headless == 4.10.0.84
 streamlit_webrtc
 av
 mediapipe == 0.10.9
+camera_input_live
