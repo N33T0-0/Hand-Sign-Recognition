@@ -3,3 +3,5 @@ opencv-contrib-python == 4.10.0.84
 av
 mediapipe == 0.10.9
 streamlit-camera-input-live
+streamlit-webrtc
+keras == 3.7.0
