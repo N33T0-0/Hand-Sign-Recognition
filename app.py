@@ -117,16 +117,17 @@ st.title("Hand Sign Recognition")
 # if image:
 #     st.image(image)
 
-class DummyTransformer(VideoTransformerBase):
-    def transform(self, frame):
-        return frame  # Simply pass the frame without modifications
+# class DummyTransformer(VideoTransformerBase):
+#     def transform(self, frame):
+#         return frame  # Simply pass the frame without modifications
 
-webrtc_streamer(
-    key="hand-sign-recognition",
-    mode=WebRtcMode.SENDRECV,
-    video_processor_factory=DummyTransformer,
-    media_stream_constraints={"video": True, "audio": False},
-    async_processing=True,  # Ensures asynchronous handling
-    rtc_configuration={"iceServers": get_ice_servers()},
-)
+# webrtc_streamer(
+#     key="hand-sign-recognition",
+#     mode=WebRtcMode.SENDRECV,
+#     video_processor_factory=DummyTransformer,
+#     media_stream_constraints={"video": True, "audio": False},
+#     async_processing=True,  # Ensures asynchronous handling
+#     rtc_configuration={"iceServers": get_ice_servers()},
+# )
 
+print(get_ice_servers())
