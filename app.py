@@ -3,12 +3,6 @@ import keras
 import cv2
 import mediapipe as mp
 import numpy as np
-from PIL import Image
-from io import BytesIO
-
-from camera_input_live import camera_input_live
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, WebRtcMode
-from turn import get_ice_servers
 
 # Decode
 target = ['a','b','c','e','i','m','o','s','t','u']
@@ -30,14 +24,21 @@ hands = mp_hands.Hands()
 # Initialize MediaPipe Drawing module for drawing landmarks
 mp_drawing = mp.solutions.drawing_utils
 
-def run(frame):
-    # Convert frame byte to 
-    img = cv2.imdecode(np.frombuffer(frame.read(), np.uint8), 1)
-        
+st.title("Hand Sign Recognition")
+
+enable = st.checkbox("Enable camera")
+cam = cv2.VideoCapture(0)
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+FRAME_WINDOW = st.image([]) 
+
+while enable:
+    ret, frame = cam.read()
+
     # Convert the frame to RGB format
-    frame_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    h, w, c = frame_rgb.shape
+    h, w, c = frame.shape
     
     # Process the frame to detect hands
     results = hands.process(frame_rgb)
@@ -45,7 +46,7 @@ def run(frame):
     # Process the frame to detect hands
     results = hands.process(frame_rgb)
 
-    cropped_frame = frame_rgb
+    cropped_frame = frame
     
     position = []
     edges = []
@@ -80,7 +81,7 @@ def run(frame):
             # # Draw landmarks on the frame
             # mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
             
-            cropped_frame = frame_rgb[y_min:y_max,x_min:x_max]
+            cropped_frame = frame[y_min:y_max,x_min:x_max]
             
             temp_img = cv2.resize(cropped_frame,(100,100))
             temp_img = cv2.cvtColor(temp_img, cv2.COLOR_BGR2GRAY)
@@ -100,32 +101,4 @@ def run(frame):
                 cv2.rectangle(frame_rgb, (x_min, y_min - 20), (x_min + 20, y_min), (0,255,0), -1)
                 cv2.putText(frame_rgb, pred, (x_min, y_min), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 3)
 
-    # convert Image...
-    image_conv = Image.fromarray(frame_rgb)
-
-    img_buffer = BytesIO()
-    image_conv.save(img_buffer, format='PNG')  # Save the image to the BytesIO object
-    img_buffer.seek(0)
-
-    return img_buffer
-
-
-st.title("Hand Sign Recognition")
-
-# image = run(camera_input_live(debounce=2000))
-
-# if image:
-#     st.image(image)
-
-# class DummyTransformer(VideoTransformerBase):
-#     def transform(self, frame):
-#         return frame  # Simply pass the frame without modifications
-
-# webrtc_streamer(
-#     key="hand-sign-recognition",
-#     mode=WebRtcMode.SENDRECV,
-#     video_processor_factory=DummyTransformer,
-#     media_stream_constraints={"video": True, "audio": False},
-#     async_processing=True,  # Ensures asynchronous handling
-#     rtc_configuration={"iceServers": get_ice_servers()},
-# )
+    FRAME_WINDOW.image(frame_rgb)
