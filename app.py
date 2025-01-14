@@ -111,7 +111,7 @@ def run(frame):
 
 st.title("Hand Sign Recognition")
 
-image = run(camera_input_live(debounce=1000))
+image = run(camera_input_live(debounce=2000))
 
 if image:
     st.image(image)
