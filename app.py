@@ -8,6 +8,7 @@ from io import BytesIO
 
 from camera_input_live import camera_input_live
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, WebRtcMode
+from turn import get_ice_servers
 
 # Decode
 target = ['a','b','c','e','i','m','o','s','t','u']
@@ -111,20 +112,20 @@ def run(frame):
 
 st.title("Hand Sign Recognition")
 
-image = run(camera_input_live(debounce=2000))
+# image = run(camera_input_live(debounce=2000))
 
-if image:
-    st.image(image)
+# if image:
+#     st.image(image)
 
-# class DummyTransformer(VideoTransformerBase):
-#     def transform(self, frame):
-#         return frame  # Simply pass the frame without modifications
+class DummyTransformer(VideoTransformerBase):
+    def transform(self, frame):
+        return frame  # Simply pass the frame without modifications
 
-# webrtc_streamer(
-#     key="hand-sign-recognition",
-#     mode=WebRtcMode.SENDRECV,
-#     video_processor_factory=DummyTransformer,
-#     media_stream_constraints={"video": True, "audio": False},
-#     async_processing=True,  # Ensures asynchronous handling
-#     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-# )
+webrtc_streamer(
+    key="hand-sign-recognition",
+    mode=WebRtcMode.SENDRECV,
+    video_processor_factory=DummyTransformer,
+    media_stream_constraints={"video": True, "audio": False},
+    async_processing=True,  # Ensures asynchronous handling
+    rtc_configuration={"iceServers": get_ice_servers()},
+)
