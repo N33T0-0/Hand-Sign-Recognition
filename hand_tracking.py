@@ -2,13 +2,21 @@ import cv2
 import mediapipe as mp
 import keras
 import numpy as np
+import joblib
+
+# Decode
+target = ['a','b','c','e','i','m','o','s','t','u']
 
 # Load Model in
 classification_model = keras.models.load_model('nn.keras')
+# classification_model = joblib.load('random_forest.joblib')
 
 def processNClassify(X):
     pred = classification_model.predict(X)
-    print(np.argmax(pred))
+    # print(target[np.argmax(pred)])
+    # print(np.argmax(pred))
+    return target[np.argmax(pred)]
+
 
 
 # Initialize MediaPipe Hands module
@@ -53,13 +61,13 @@ while cap.isOpened():
                 x, y = int(lm.x * w), int(lm.y * h)
                 position.append([x,y])
                 if x > x_max:
-                    x_max = x + 60
+                    x_max = x + 30
                 if x < x_min:
-                    x_min = x - 60
+                    x_min = x - 30
                 if y > y_max:
-                    y_max = y + 60
+                    y_max = y + 30
                 if y < y_min:
-                    y_min = y - 60
+                    y_min = y - 30
             if x_min < 0:
                 x_min = 0
             if y_min < 0:
@@ -87,7 +95,9 @@ while cap.isOpened():
 
             
             if position_ary.shape[1] == 42:
-                processNClassify(img_zip)
+                pred = processNClassify(img_zip)
+                cv2.rectangle(frame, (x_min, y_min - 20), (x_min + 20, y_min), (0,255,0), -1)
+                cv2.putText(frame, pred, (x_min, y_min), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 3)
 
             # cv2.imshow('Cropped Img', cropped_frame)
     

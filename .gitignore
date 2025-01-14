@@ -1,3 +1,5 @@
 Training_Data/
 training_data_2/
+validate_data/
+hyperparam_tuning/
 *.ipynb
