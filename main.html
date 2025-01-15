@@ -1,0 +1,54 @@
+<html>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+
+        const socket = new WebSocket('http://localhost:8000/ws');
+
+        // Start webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => console.error('Error accessing webcam:', err));
+
+        video.addEventListener('play', () => {
+            const sendFrame = () => {
+                // Draw the video frame on the canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Get the frame as a Base64 string
+                const frameBase64 = canvas.toDataURL('image/png').split(',')[1];
+
+                // Send the frame to the backend
+                socket.send(JSON.stringify({ frame: frameBase64 }));
+            };
+
+            // Send frames at an interval
+            setInterval(sendFrame, 500);
+        });
+
+        // Receive processed frame from the backend
+        socket.onmessage = event => {
+            const data = JSON.parse(event.data);
+            const base64Frame = data.frame;
+
+            // Create an image from the Base64 string
+            const img = new Image();
+            img.src = "data:image/png;base64," + base64Frame;
+
+            img.onload = () => {
+                // Draw the processed frame on the canvas
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+        };
+
+        socket.onerror = error => console.error('WebSocket error:', error);
+    </script>
+</html>
