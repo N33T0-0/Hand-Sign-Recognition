@@ -3,12 +3,12 @@ import keras
 import cv2
 import mediapipe as mp
 import numpy as np
-from PIL import Image
-from io import BytesIO
+# from PIL import Image
+# from io import BytesIO
 
-from camera_input_live import camera_input_live
+# from camera_input_live import camera_input_live
 
-import streamlit.components.v1 as components
+# import streamlit.components.v1 as components
 
 # components.html(
 #     """<video id="video" autoplay></video>
@@ -36,13 +36,6 @@ def processNClassify(X):
     # print(target[np.argmax(pred)])
     # print(np.argmax(pred))
     return target[np.argmax(pred)]
-
-# Initialize MediaPipe Hands module
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands()
-
-# Initialize MediaPipe Drawing module for drawing landmarks
-mp_drawing = mp.solutions.drawing_utils
 
 st.title("Hand Sign Recognition")
 
@@ -243,6 +236,13 @@ if image is not None:
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     h, w, c = frame.shape
+
+    # Initialize MediaPipe Hands module
+    mp_hands = mp.solutions.hands
+    hands = mp_hands.Hands()
+
+    # Initialize MediaPipe Drawing module for drawing landmarks
+    mp_drawing = mp.solutions.drawing_utils
     
     # Process the frame to detect hands
     results = hands.process(frame_rgb)
